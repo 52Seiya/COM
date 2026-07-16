@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>COM ― COMplain to COMpany</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@500;700;900&family=Noto+Sans+JP:wght@400;500;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#efeae1;
+    --paper-dark:#e4ddcd;
+    --ink:#201d1a;
+    --ink-soft:#615a4d;
+    --line:#cfc4ac;
+    --hanko:#b7282e;
+    --hanko-dark:#8f1f24;
+    --teal:#3f6b62;
+    --display: 'Zen Kaku Gothic New', sans-serif;
+    --body: 'Noto Sans JP', sans-serif;
+    --mono: 'JetBrains Mono', monospace;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(ellipse at top, rgba(255,255,255,0.35), transparent 60%),
+      var(--paper);
+    background-attachment:fixed;
+    color:var(--ink);
+    font-family:var(--body);
+    line-height:1.6;
+    min-height:100vh;
+  }
+  body::before{
+    content:"";
+    position:fixed; inset:0;
+    pointer-events:none;
+    opacity:0.05;
+    background-image:repeating-linear-gradient(0deg, #000 0 1px, transparent 1px 3px);
+    mix-blend-mode:multiply;
+  }
+  a{color:inherit;}
+  ::selection{background:var(--hanko); color:#fff;}
+
+  /* ---------- Header ---------- */
+  header{
+    position:sticky; top:0; z-index:50;
+    background:var(--paper);
+    border-bottom:3px double var(--ink);
+    padding:14px 20px 16px;
+  }
+  .brand-row{
+    display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; gap:10px;
+    max-width:1040px; margin:0 auto;
+  }
+  .brand{display:flex; align-items:baseline; gap:12px; flex-wrap:wrap;}
+  .brand .mark{
+    font-family:var(--display); font-weight:900; font-size:34px; letter-spacing:1px;
+    color:var(--ink); border:2.5px solid var(--ink); padding:2px 10px 4px;
+    transform:skewX(-4deg); background:#fff8;
+  }
+  .brand .full{font-family:var(--mono); font-size:12px; letter-spacing:0.5px; color:var(--ink-soft);}
+  .brand .full b{color:var(--hanko); font-weight:700;}
+  .header-actions{display:flex; align-items:center; gap:10px;}
+  .help-btn{
+    width:34px; height:34px; border-radius:50%;
+    border:2px solid var(--ink); background:#fff8; color:var(--ink);
+    font-family:var(--display); font-weight:900; font-size:16px;
+    display:flex; align-items:center; justify-content:center; cursor:pointer;
+    transition:all .15s ease;
+  }
+  .help-btn:hover{background:var(--hanko); border-color:var(--hanko); color:#fff; transform:rotate(8deg);}
+
+  main{max-width:1040px; margin:0 auto; padding:26px 20px 80px;}
+
+  h2.section-title{
+    font-family:var(--display); font-weight:700; font-size:16px;
+    letter-spacing:2px; text-transform:uppercase; color:var(--ink-soft);
+    margin:34px 0 14px; display:flex; align-items:center; gap:10px;
+  }
+  h2.section-title::after{content:""; flex:1; height:1px; background:var(--line);}
+
+  /* ---------- shared slip look ---------- */
+  .slip{
+    background:#fbf9f4; border:1px solid var(--line);
+    box-shadow:0 1px 0 var(--line), 0 3px 10px rgba(30,25,10,0.06);
+    position:relative;
+  }
+  .slip::before{
+    content:"";
+    position:absolute; top:-6px; left:0; right:0; height:6px;
+    background-image:radial-gradient(circle at 10px 6px, transparent 5px, #efeae1 5.5px);
+    background-size:20px 12px; background-repeat:repeat-x;
+  }
+
+  /* ---------- search bar ---------- */
+  .search-bar{display:flex; gap:10px; padding:16px 20px; align-items:center; flex-wrap:wrap;}
+  .search-bar input[type=text]{
+    flex:1; min-width:200px; font-family:var(--body); font-size:14px;
+    border:1.5px solid var(--line); border-radius:24px; padding:9px 16px; outline:none; background:#fff;
+  }
+  .search-bar input[type=text]:focus{border-color:var(--hanko);}
+  .search-bar button.search-go{
+    font-family:var(--mono); font-weight:700; font-size:12.5px; color:#fff;
+    background:var(--ink); border:none; padding:9px 18px; border-radius:24px; cursor:pointer;
+  }
+  .search-bar button.search-clear{
+    font-family:var(--mono); font-size:12px; color:var(--ink-soft);
+    background:none; border:none; text-decoration:underline; cursor:pointer;
+  }
+  .search-hint{font-family:var(--mono); font-size:11px; color:var(--ink-soft); padding:0 20px 14px;}
+
+  /* ---------- new COM form ---------- */
+  .new-com{padding:20px 22px 22px;}
+  .new-com .label{
+    font-family:var(--mono); font-size:11px; letter-spacing:1px; color:var(--ink-soft); text-transform:uppercase;
+    margin-bottom:4px; display:block;
+  }
+  .new-com .field{margin-bottom:14px;}
+  .new-com input[type=text], .new-com textarea{
+    width:100%; font-family:var(--body); font-size:14.5px; color:var(--ink);
+    border:none; border-bottom:1.5px solid var(--ink); background:transparent;
+    padding:7px 2px; outline:none;
+  }
+  .new-com textarea{resize:vertical; min-height:78px; line-height:1.65;}
+  .new-com input:focus, .new-com textarea:focus{border-bottom-color:var(--hanko);}
+  .row2{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+  @media (max-width:560px){.row2{grid-template-columns:1fr;}}
+  .submit-row{display:flex; justify-content:flex-end; margin-top:16px;}
+  button.stamp-btn{
+    font-family:var(--display); font-weight:700; font-size:14px;
+    background:var(--hanko); color:#fff; border:none; padding:11px 26px;
+    cursor:pointer; letter-spacing:1px; border-radius:2px;
+    transition:transform .12s ease, box-shadow .12s ease;
+    box-shadow:0 2px 0 var(--hanko-dark);
+  }
+  button.stamp-btn:hover{transform:translateY(-1px);}
+  button.stamp-btn:active{transform:translateY(1px); box-shadow:0 1px 0 var(--hanko-dark);}
+
+  /* ---------- COM thread card ---------- */
+  .com-card{margin-bottom:18px; padding:18px 22px 16px;}
+  .com-head{display:flex; justify-content:space-between; align-items:flex-start; gap:14px; flex-wrap:wrap;}
+  .com-id{font-family:var(--mono); font-size:11px; color:var(--ink-soft); letter-spacing:0.5px;}
+  .com-title{font-family:var(--display); font-weight:700; font-size:19px; margin:4px 0 8px; line-height:1.4;}
+  .com-target{
+    display:inline-flex; align-items:center; gap:6px;
+    font-family:var(--mono); font-size:12.5px; color:var(--ink-soft);
+    background:var(--paper-dark); padding:3px 9px; border-radius:20px; border:1px solid var(--line);
+  }
+  .com-content{font-size:14.5px; margin:12px 0 6px; white-space:pre-wrap; color:#33302a;}
+  .com-time{font-family:var(--mono); font-size:11px; color:#948a76; margin-top:2px;}
+
+  .com-footer{
+    display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;
+    margin-top:14px; padding-top:12px; border-top:1px dashed var(--line);
+  }
+  .vote-group{display:flex; align-items:center; gap:8px;}
+  .vote-btn{
+    display:flex; align-items:center; gap:6px;
+    font-family:var(--mono); font-size:13px; font-weight:600;
+    border:1.5px solid var(--ink); background:#fff; color:var(--ink);
+    padding:6px 12px; border-radius:20px; cursor:pointer; transition:all .12s ease;
+  }
+  .vote-btn svg{width:14px; height:14px;}
+  .vote-btn.up.active{background:var(--hanko); border-color:var(--hanko); color:#fff;}
+  .vote-btn.down.active{background:var(--ink); border-color:var(--ink); color:#fff;}
+  .vote-btn:hover{transform:translateY(-1px);}
+  .score{
+    font-family:var(--mono); font-size:12px; color:var(--ink-soft); margin-left:6px;
+    padding:3px 9px; border:1px solid var(--line); border-radius:20px; background:var(--paper-dark);
+  }
+  .score b{font-size:14px;}
+  .score.pos b{color:var(--teal);}
+  .score.neg b{color:var(--hanko);}
+
+  .toggle-comments{
+    font-family:var(--display); font-size:13px; font-weight:700; color:var(--ink-soft);
+    background:none; border:none; cursor:pointer; text-decoration:underline; text-underline-offset:3px;
+  }
+  .toggle-comments:hover{color:var(--hanko);}
+
+  /* ---------- comments ---------- */
+  .comments{margin-top:14px; display:none; border-top:1px solid var(--line); padding-top:12px;}
+  .comments.open{display:block;}
+  .comment{display:flex; gap:10px; padding:9px 0; border-bottom:1px dotted var(--line);}
+  .comment:last-child{border-bottom:none;}
+  .comment .avatar{
+    width:26px; height:26px; border-radius:50%; flex:none;
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--mono); font-size:10px; font-weight:700; color:#fff;
+    background:var(--ink-soft);
+  }
+  .comment-body{flex:1;}
+  .comment-meta{display:flex; align-items:center; gap:8px; margin-bottom:2px;}
+  .comment-author{font-family:var(--mono); font-size:12px; font-weight:700;}
+  .comment-text{font-size:13.5px; color:#33302a; white-space:pre-wrap;}
+  .comment-time{font-family:var(--mono); font-size:10.5px; color:#948a76;}
+
+  .comment-form{display:flex; gap:8px; margin-top:10px;}
+  .comment-form input{
+    flex:1; font-family:var(--body); font-size:13.5px; border:1.5px solid var(--line);
+    border-radius:20px; padding:8px 14px; outline:none; background:#fff;
+  }
+  .comment-form input:focus{border-color:var(--hanko);}
+  .comment-form button{
+    font-family:var(--mono); font-size:12px; font-weight:700; border:none;
+    background:var(--ink); color:#fff; padding:0 16px; border-radius:20px; cursor:pointer;
+  }
+
+  .company-name-row{display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
+  .empty-state{
+    text-align:center; padding:50px 20px; color:var(--ink-soft);
+    font-family:var(--display); font-size:14px;
+  }
+
+  footer{
+    text-align:center; font-family:var(--mono); font-size:11px; color:var(--ink-soft);
+    padding:30px 20px 50px; border-top:1px solid var(--line);
+  }
+
+  /* ---------- autocomplete ---------- */
+  .autocomplete-wrap{position:relative;}
+  .suggest-list{
+    position:absolute; top:100%; left:0; right:0; margin-top:2px;
+    background:#fff; border:1px solid var(--line);
+    max-height:230px; overflow-y:auto; z-index:30;
+    box-shadow:0 6px 16px rgba(20,17,12,0.12);
+    display:none;
+  }
+  .suggest-list.open{display:block;}
+  .suggest-item{
+    padding:9px 14px; font-family:var(--body); font-size:13.5px; cursor:pointer;
+    border-bottom:1px solid var(--paper-dark);
+  }
+  .suggest-item:last-child{border-bottom:none;}
+  .suggest-item:hover{background:var(--paper-dark);}
+  .suggest-empty{padding:9px 14px; font-family:var(--mono); font-size:11.5px; color:#a89a7c;}
+
+  /* ---------- Help modal ---------- */
+  .modal-overlay{
+    position:fixed; inset:0; background:rgba(20,17,12,0.55);
+    display:none; align-items:center; justify-content:center; z-index:100; padding:20px;
+  }
+  .modal-overlay.open{display:flex;}
+  .modal{
+    background:var(--paper); border:2px solid var(--ink); max-width:600px; width:100%;
+    max-height:85vh; overflow-y:auto; position:relative; padding:30px 30px 26px;
+    box-shadow:0 10px 40px rgba(0,0,0,0.3);
+  }
+  .modal::before{
+    content:"";
+    position:absolute; top:-6px; left:0; right:0; height:6px;
+    background-image:radial-gradient(circle at 10px 6px, transparent 5px, rgba(20,17,12,0.55) 5.5px);
+    background-size:20px 12px; background-repeat:repeat-x;
+  }
+  .modal-close{
+    position:absolute; top:14px; right:16px; width:30px; height:30px; border-radius:50%;
+    border:1.5px solid var(--ink); background:transparent; cursor:pointer;
+    font-family:var(--display); font-size:14px; color:var(--ink);
+  }
+  .modal-close:hover{background:var(--ink); color:#fff;}
+  .modal h3{font-family:var(--display); font-weight:900; font-size:22px; margin:0 0 6px;}
+  .modal .modal-sub{font-family:var(--mono); font-size:12px; color:var(--ink-soft); margin-bottom:22px;}
+  .guide-steps{list-style:none; margin:0; padding:0; counter-reset:step;}
+  .guide-steps li{
+    counter-increment:step;
+    display:flex; gap:12px; padding:9px 0; border-bottom:1px dotted var(--line);
+    font-size:13.5px;
+  }
+  .guide-steps li:last-child{border-bottom:none;}
+  .guide-steps li::before{
+    content:counter(step);
+    flex:none; width:22px; height:22px; border-radius:50%;
+    background:var(--paper-dark); border:1.5px solid var(--ink);
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--mono); font-weight:700; font-size:11px;
+  }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+</head>
+<body>
+
+<header>
+  <div class="brand-row">
+    <div class="brand">
+      <span class="mark">COM</span>
+      <span class="full">COM<b>plain</b> to COM<b>pany</b> ― 商品・サービスへの声を自由に届ける意見箱</span>
+    </div>
+    <div class="header-actions">
+      <button class="help-btn" onclick="openHelp()" title="利用ガイドを見る">？</button>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <h2 class="section-title">COMを検索する</h2>
+  <div class="slip">
+    <div class="search-bar">
+      <input type="text" id="client-search" placeholder="キーワード・企業名で検索（例：新プラン、パッケージ、〇〇株式会社）" onkeydown="if(event.key==='Enter'){runClientSearch();}">
+      <button class="search-go" onclick="runClientSearch()">検索する</button>
+      <button class="search-clear" onclick="clearClientSearch()">クリア</button>
+    </div>
+    <div class="search-hint">同じ意見のCOMが見つかったら、新しく立てずに「いいね」で応援しましょう。</div>
+  </div>
+
+  <h2 class="section-title">見つからなければ、新しいCOMを立てる</h2>
+  <div class="slip new-com">
+    <div class="row2">
+      <div class="field">
+        <label class="label">対象企業</label>
+        <div class="autocomplete-wrap">
+          <input type="text" id="new-company" placeholder="例：フーズマート株式会社" autocomplete="off">
+          <div class="suggest-list" id="new-company-suggest"></div>
+        </div>
+      </div>
+      <div class="field">
+        <label class="label">題名（簡潔に）</label>
+        <input type="text" id="new-title" placeholder="例：詰め替え用パッケージを増やしてほしい" maxlength="60">
+      </div>
+    </div>
+    <div class="field">
+      <label class="label">詳細な内容</label>
+      <textarea id="new-content" placeholder="商品の性質・特徴や、サービス内容についての意見、または新サービス・新製品の提案を具体的に書いてください"></textarea>
+    </div>
+    <div class="submit-row">
+      <button class="stamp-btn" onclick="createThread()">COMを立てる</button>
+    </div>
+  </div>
+
+  <h2 class="section-title" id="client-list-title">最新のCOM一覧</h2>
+  <div id="client-thread-list"></div>
+
+</main>
+
+<footer>
+  COM ― 評価スコア = 高評価(♥) − 低評価(×)。<br>
+  ※ COMは商品の性質・特徴やサービス内容、新サービス・製品への提案の場です。日々の対応ミス等の個別クレームはCOMの対象外です。<br>
+  ※ このページは単一HTMLで動作するデモです。データはブラウザのlocalStorageに保存され、投稿・企業名は認証されていません。
+</footer>
+
+<!-- ===================== Help Modal ===================== -->
+<div class="modal-overlay" id="help-overlay" onclick="if(event.target===this) closeHelp();">
+  <div class="modal">
+    <button class="modal-close" onclick="closeHelp()">×</button>
+    <h3>COM 利用ガイド</h3>
+    <div class="modal-sub">COMは、商品の性質・特徴やサービス内容、新サービス・新製品の提案を自由に投稿できる意見箱です。</div>
+    <ol class="guide-steps">
+      <li>自分の言いたいCOMがあるか検索する</li>
+      <li>ヒットしたら「いいね」で目につきやすいように応援する</li>
+      <li>ヒットしなかったら新しくCOMを作る</li>
+      <li>気になるCOMがあれば、コメント欄でさらに改善案を議論する</li>
+    </ol>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   Supabase 接続設定
+   ここに STEP C で取得した値を入れてください
+   ========================================================= */
+const SUPABASE_URL = 'ここにAPI URLを貼り付け';       // 例: https://xxxxx.supabase.co
+const SUPABASE_ANON_KEY = 'ここにpublishable keyを貼り付け';
+
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+/* =========================================================
+   自分のブラウザを識別するID（投票の二重防止用／認証ではない）
+   ========================================================= */
+const VOTER_KEY = 'com_voter_id';
+function getVoterId(){
+  let id = localStorage.getItem(VOTER_KEY);
+  if(!id){
+    id = 'v_' + Math.random().toString(36).slice(2) + Date.now().toString(36);
+    localStorage.setItem(VOTER_KEY, id);
+  }
+  return id;
+}
+const voterId = getVoterId();
+
+/* =========================================================
+   状態
+   ========================================================= */
+let threads = [];       // Supabaseから読み込んだCOM一覧（コメント込み）
+let myVotes = {};        // { threadId: 'up' | 'down' }
+let clientQuery = '';
+
+/* =========================================================
+   ユーティリティ
+   ========================================================= */
+function escapeHtml(str){
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+function timeAgo(iso){
+  const diff = Math.floor((Date.now() - new Date(iso).getTime())/1000);
+  if(diff < 60) return 'たった今';
+  if(diff < 3600) return Math.floor(diff/60)+'分前';
+  if(diff < 86400) return Math.floor(diff/3600)+'時間前';
+  return Math.floor(diff/86400)+'日前';
+}
+function score(t){ return t.up_count - t.down_count; }
+function normalizeName(s){ return (s||'').trim().replace(/\s+/g,'').toLowerCase(); }
+
+/* =========================================================
+   ヘルプモーダル
+   ========================================================= */
+function openHelp(){ document.getElementById('help-overlay').classList.add('open'); }
+function closeHelp(){ document.getElementById('help-overlay').classList.remove('open'); }
+
+/* =========================================================
+   データ読み込み（Supabase）
+   ========================================================= */
+async function loadThreads(){
+  const { data, error } = await supabase
+    .from('threads')
+    .select('*, comments(*)')
+    .order('created_at', { ascending:false })
+    .order('created_at', { foreignTable:'comments', ascending:true });
+
+  if(error){
+    console.error(error);
+    document.getElementById('client-thread-list').innerHTML =
+      `<div class="empty-state">読み込みに失敗しました。SUPABASE_URL / SUPABASE_ANON_KEY の設定をご確認ください。</div>`;
+    return;
+  }
+  threads = data;
+
+  const { data: voteRows } = await supabase
+    .from('votes')
+    .select('thread_id, vote_type')
+    .eq('voter_id', voterId);
+
+  myVotes = {};
+  (voteRows || []).forEach(v => { myVotes[v.thread_id] = v.vote_type; });
+}
+
+/* =========================================================
+   企業名の予測変換（既出の企業名から候補を出すだけ／認証なし）
+   ========================================================= */
+function getCompanyPool(){
+  const pool = new Map();
+  threads.forEach(t => pool.set(normalizeName(t.company_name), t.company_name));
+  return Array.from(pool.values());
+}
+function setupAutocomplete(inputId, listId){
+  const input = document.getElementById(inputId);
+  const list = document.getElementById(listId);
+
+  function render(){
+    const q = input.value.trim().toLowerCase();
+    if(!q){ list.classList.remove('open'); list.innerHTML=''; return; }
+    const matches = getCompanyPool()
+      .filter(name => name.toLowerCase().includes(q))
+      .sort((a,b)=> a.toLowerCase().indexOf(q) - b.toLowerCase().indexOf(q))
+      .slice(0, 8);
+
+    if(matches.length===0){
+      list.innerHTML = `<div class="suggest-empty">一致する既出の企業名がありません（そのまま新しい企業名として投稿できます）</div>`;
+      list.classList.add('open');
+      return;
+    }
+    list.innerHTML = matches.map(name => `<div class="suggest-item" data-name="${escapeHtml(name)}">${escapeHtml(name)}</div>`).join('');
+    list.classList.add('open');
+  }
+
+  input.addEventListener('input', render);
+  input.addEventListener('focus', render);
+  list.addEventListener('mousedown', (e)=>{
+    const item = e.target.closest('.suggest-item');
+    if(!item) return;
+    e.preventDefault();
+    input.value = item.getAttribute('data-name');
+    list.classList.remove('open');
+  });
+  document.addEventListener('click', (e)=>{
+    if(e.target !== input && !list.contains(e.target)) list.classList.remove('open');
+  });
+}
+
+/* =========================================================
+   COM作成
+   ========================================================= */
+async function createThread(){
+  const companyName = document.getElementById('new-company').value.trim();
+  const title = document.getElementById('new-title').value.trim();
+  const content = document.getElementById('new-content').value.trim();
+  if(!companyName || !title || !content){
+    alert('対象企業・題名・詳細な内容をすべて入力してください。');
+    return;
+  }
+  const { error } = await supabase.from('threads').insert({
+    title, company_name: companyName, content
+  });
+  if(error){ console.error(error); alert('投稿に失敗しました。時間をおいて再度お試しください。'); return; }
+
+  document.getElementById('new-company').value = '';
+  document.getElementById('new-title').value = '';
+  document.getElementById('new-content').value = '';
+  await loadThreads();
+  renderClientList();
+}
+
+/* =========================================================
+   検索
+   ========================================================= */
+function runClientSearch(){
+  clientQuery = document.getElementById('client-search').value.trim();
+  renderClientList();
+}
+function clearClientSearch(){
+  clientQuery = '';
+  document.getElementById('client-search').value = '';
+  renderClientList();
+}
+function matchesQuery(t, q){
+  if(!q) return true;
+  const n = q.toLowerCase();
+  return t.title.toLowerCase().includes(n)
+    || t.content.toLowerCase().includes(n)
+    || t.company_name.toLowerCase().includes(n);
+}
+
+/* =========================================================
+   投票（同一ブラウザにつき1スレッド1票。取り消し・変更も可能）
+   ========================================================= */
+async function vote(threadId, type){
+  const t = threads.find(t=>t.id===threadId);
+  if(!t) return;
+  const prevType = myVotes[threadId];
+  const field = (v) => v === 'up' ? 'up_count' : 'down_count';
+
+  try{
+    if(prevType === type){
+      // 同じボタンをもう一度 → 取り消し
+      await supabase.from('votes').delete().eq('thread_id', threadId).eq('voter_id', voterId);
+      await supabase.from('threads').update({ [field(type)]: t[field(type)] - 1 }).eq('id', threadId);
+    } else if(prevType){
+      // 逆のボタン → 投票を変更
+      await supabase.from('votes').update({ vote_type: type }).eq('thread_id', threadId).eq('voter_id', voterId);
+      await supabase.from('threads').update({ [field(prevType)]: t[field(prevType)] - 1 }).eq('id', threadId);
+      await supabase.from('threads').update({ [field(type)]: t[field(type)] + 1 }).eq('id', threadId);
+    } else {
+      // 新規投票
+      await supabase.from('votes').insert({ thread_id: threadId, voter_id: voterId, vote_type: type });
+      await supabase.from('threads').update({ [field(type)]: t[field(type)] + 1 }).eq('id', threadId);
+    }
+  }catch(e){
+    console.error(e);
+  }
+  await loadThreads();
+  renderClientList();
+}
+
+/* =========================================================
+   コメント
+   ========================================================= */
+function toggleComments(threadId){
+  document.getElementById('comments-'+threadId).classList.toggle('open');
+}
+async function addComment(threadId, inputId){
+  const input = document.getElementById(inputId);
+  const text = input.value.trim();
+  if(!text) return;
+  const { error } = await supabase.from('comments').insert({
+    thread_id: threadId, author: '名無しさん', content: text
+  });
+  if(error){ console.error(error); alert('コメントの送信に失敗しました。'); return; }
+  input.value = '';
+  await loadThreads();
+  renderClientList();
+}
+
+/* =========================================================
+   カード描画
+   ========================================================= */
+function renderComments(t, opened){
+  const commentsHtml = (t.comments || []).map(c=>`
+    <div class="comment">
+      <div class="avatar">${escapeHtml((c.author||'名').slice(0,1))}</div>
+      <div class="comment-body">
+        <div class="comment-meta">
+          <span class="comment-author">${escapeHtml(c.author)}</span>
+          <span class="comment-time">${timeAgo(c.created_at)}</span>
+        </div>
+        <div class="comment-text">${escapeHtml(c.content)}</div>
+      </div>
+    </div>`).join('');
+
+  const inputId = 'ci-'+t.id;
+  return `
+  <div class="comments${opened?' open':''}" id="comments-${t.id}">
+    ${commentsHtml || '<div style="font-family:var(--mono);font-size:12px;color:#948a76;padding:6px 0;">まだコメントはありません。改善案があれば議論しましょう。</div>'}
+    <div class="comment-form">
+      <input type="text" id="${inputId}" placeholder="改善案・コメントを書く…">
+      <button onclick="addComment(${t.id}, '${inputId}')">送信</button>
+    </div>
+  </div>`;
+}
+
+function threadCardHtml(t, opened){
+  const s = score(t);
+  const scoreClass = s>0?'pos':(s<0?'neg':'');
+  const voteState = myVotes[t.id];
+  const commentCount = (t.comments || []).length;
+  return `
+  <div class="slip com-card">
+    <div class="com-head">
+      <div>
+        <div class="com-id">COM No.${t.id}</div>
+        <div class="com-title">${escapeHtml(t.title)}</div>
+        <div class="company-name-row">
+          <span class="com-target">🎯 ${escapeHtml(t.company_name)}</span>
+        </div>
+      </div>
+    </div>
+    <div class="com-content">${escapeHtml(t.content)}</div>
+    <div class="com-time">投稿: ${timeAgo(t.created_at)}</div>
+
+    <div class="com-footer">
+      <div class="vote-group">
+        <button class="vote-btn up ${voteState==='up'?'active':''}" onclick="vote(${t.id},'up')">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7.5-4.9-10-9.3C.4 8.7 2 5 5.6 5 8 5 10 6.6 12 9c2-2.4 4-4 6.4-4C22 5 23.6 8.7 22 11.7 19.5 16.1 12 21 12 21z"/></svg>
+          ${t.up_count}
+        </button>
+        <button class="vote-btn down ${voteState==='down'?'active':''}" onclick="vote(${t.id},'down')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 5l14 14M19 5L5 19"/></svg>
+          ${t.down_count}
+        </button>
+        <span class="score ${scoreClass}">評価スコア <b>${s>0?'+':''}${s}</b></span>
+      </div>
+      <button class="toggle-comments" onclick="toggleComments(${t.id})">議論する（コメント${commentCount}件）</button>
+    </div>
+
+    ${renderComments(t, opened)}
+  </div>`;
+}
+
+function renderClientList(){
+  const all = [...threads].sort((a,b)=> new Date(b.created_at) - new Date(a.created_at));
+  const list = all.filter(t=>matchesQuery(t, clientQuery));
+  const container = document.getElementById('client-thread-list');
+  const titleEl = document.getElementById('client-list-title');
+
+  titleEl.textContent = clientQuery ? `「${clientQuery}」の検索結果（${list.length}件）` : '最新のCOM一覧';
+
+  if(list.length===0){
+    container.innerHTML = clientQuery
+      ? `<div class="empty-state">一致するCOMが見つかりませんでした。下のフォームから新しくCOMを立てましょう。</div>`
+      : `<div class="empty-state">まだCOMが立てられていません。最初のCOMを投稿してみましょう。</div>`;
+    return;
+  }
+  container.innerHTML = list.map(t=>threadCardHtml(t,false)).join('');
+}
+
+/* =========================================================
+   初期化
+   ========================================================= */
+(async function init(){
+  document.getElementById('client-thread-list').innerHTML =
+    `<div class="empty-state">読み込み中…</div>`;
+  await loadThreads();
+  renderClientList();
+  setupAutocomplete('new-company', 'new-company-suggest');
+})();
+
+</script>
+</body>
+</html>
